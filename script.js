@@ -23,53 +23,61 @@ function parseResults(results) {
   };
 }
 
-function renderWeather() {
-  const weatherListElement = document.querySelector('#weather-list');
-  weatherListElement.innerHTML = '';
+function renderWeatherItem(weather, weatherListElement) {
+  const weatherItem = document.createElement('div');
+  weatherItem.classList.add('weather');
 
-  weatherList.forEach((weather) => {
-    const weatherItem = document.createElement('div');
-    weatherItem.classList.add('weather');
-  
-    const location = document.createElement('div');
-    location.classList.add('location')
-    location.textContent = `${weather.location}, ${weather.country}`;
-  
-    const icon = document.createElement('img');
-    icon.classList.add('icon')
-    icon.src = weather.conditionIcon;
-  
-    const condition = document.createElement('div');
-    condition.classList.add('condition')
-    condition.textContent = weather.conditionText;
-  
-    const temperature = document.createElement('div');
-    temperature.classList.add('temperature')
-    temperature.textContent = `${weather.celsius} \u00B0C`;
-  
-    weatherItem.appendChild(location);
-    weatherItem.appendChild(icon);
-    weatherItem.appendChild(condition);
-    weatherItem.appendChild(temperature);
-  
-    weatherListElement.appendChild(weatherItem);
-  });
+  const location = document.createElement('div');
+  location.classList.add('location');
+  location.textContent = `${weather.location}, ${weather.country}`;
+  weatherItem.appendChild(location);
+
+  const icon = document.createElement('img');
+  icon.classList.add('icon');
+  icon.src = weather.conditionIcon;
+  weatherItem.appendChild(icon);
+
+  const condition = document.createElement('div');
+  condition.classList.add('condition');
+  condition.textContent = weather.conditionText;
+  weatherItem.appendChild(condition);
+
+  const temperature = document.createElement('div');
+  temperature.classList.add('temperature');
+  temperature.textContent = `${weather.celsius} \u00B0C`;
+  weatherItem.appendChild(temperature);
+
+  weatherListElement.appendChild(weatherItem);
 }
 
 document.querySelector('form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(event.target);
   const location = formData.get('location');
-  
+
   const weather = await getWeatherByLocation(location).then((results) =>
     parseResults(results),
   );
 
-  weatherList.push(weather);
+  const weatherIndex = weatherList.findIndex(
+    (w) => w.location === weather.location,
+  );
 
-  renderWeather();
+  if (weatherIndex === -1) {
+    weatherList.push(weather);
+
+    const weatherListElement = document.querySelector('#weather-list');
+    weatherListElement.innerHTML = '';
+
+    weatherList.forEach((weatherItem) => {
+      renderWeatherItem(weatherItem, weatherListElement);
+    });
+  } else {
+    console.log('Location already added. Please update.');
+  }
+
+  event.target.reset();
 });
-
 
 // const btn = document.querySelector('.toggle');
 // const temp = document.querySelector('.temp');
