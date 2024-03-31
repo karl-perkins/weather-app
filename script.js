@@ -21,10 +21,30 @@ function parseResults(results) {
   };
 }
 
+let weather = {};
 document.querySelector('form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(event.target);
   const location = formData.get('location');
-  const weather = await getWeatherByLocation(location).then((results) => parseResults(results));
-  document.querySelector('output').textContent = weather.conditionText;
+  weather = await getWeatherByLocation(location).then((results) =>
+    parseResults(results),
+  );
+
+  document.querySelector('.condition').textContent = weather.conditionText;
+  document.querySelector('.location').textContent =
+    `${weather.location}, ${weather.country}`;
+  document.querySelector('.icon').src = weather.conditionIcon;
+  document.querySelector('.temp').textContent = weather.celsius;
+});
+
+const btn = document.querySelector('.toggle');
+const temp = document.querySelector('.temp');
+btn.addEventListener('click', () => {
+  if (btn.textContent === '\u00B0C') {
+    btn.textContent = '\u00B0F';
+    temp.textContent = weather.fahrenheit;
+  } else {
+    btn.textContent = '\u00B0C';
+    temp.textContent = weather.celsius;
+  }
 });

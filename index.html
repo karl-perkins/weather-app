@@ -9,11 +9,25 @@
   </head>
   <body>
     <h1>Weather App</h1>
+
     <form>
       <label for="location">Get weather for location: </label>
       <input type="text" name="location" id="location" />
       <button type="submit">Submit</button>
     </form>
-    <output></output>
+    
+    <div class="weather">
+      <div class="location">Wellington, New Zealand</div>
+      <img
+      class="icon"
+      src="//cdn.weatherapi.com/weather/64x64/day/122.png"
+      alt="weather icon"
+      />
+      <div class="condition">Mostly Cloudy</div>
+      <div>
+        <span class="temp">19</span>
+        <button class="toggle" type="button">&deg;C</button>
+      </div>
+    </div>
   </body>
 </html>
