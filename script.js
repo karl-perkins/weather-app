@@ -50,7 +50,17 @@ function renderLocation(location, locationsElement) {
   locationsElement.appendChild(locationElement);
 }
 
-document.querySelector('form').addEventListener('submit', async (event) => {
+function renderLocations() {
+  const locationsElement = document.querySelector('#locations');
+  locationsElement.innerHTML = '';
+
+  locations.forEach((location) => {
+    renderLocation(location, locationsElement);
+  });
+}
+
+const addLocationForm = document.querySelector('form');
+addLocationForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(event.target);
   const locationName = formData.get('location');
@@ -63,13 +73,7 @@ document.querySelector('form').addEventListener('submit', async (event) => {
 
   if (locationIndex === -1) {
     locations.push(newLocation);
-
-    const locationsElement = document.querySelector('#locations');
-    locationsElement.innerHTML = '';
-
-    locations.forEach((location) => {
-      renderLocation(location, locationsElement);
-    });
+    renderLocations();
   } else {
     console.log('Location already added. Please update.');
   }
@@ -77,14 +81,14 @@ document.querySelector('form').addEventListener('submit', async (event) => {
   event.target.reset();
 });
 
-// const btn = document.querySelector('.toggle');
-// const temp = document.querySelector('.temp');
-// btn.addEventListener('click', () => {
-//   if (btn.textContent === '\u00B0C') {
-//     btn.textContent = '\u00B0F';
-//     temp.textContent = weather.fahrenheit;
-//   } else {
-//     btn.textContent = '\u00B0C';
-//     temp.textContent = weather.celsius;
-//   }
-// });
+const updateButton = document.querySelector('.update-btn');
+updateButton.addEventListener('click', async (event) => {
+  locations.map(async (location) => {
+    const newLocation = await getWeatherByLocation(location.name).then(
+      (results) => parseResults(results),
+    );
+    return newLocation;
+  });
+
+  renderLocations();
+});
