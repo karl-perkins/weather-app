@@ -20,3 +20,11 @@ function parseResults(results) {
     conditionIcon: results.current.condition.icon,
   };
 }
+
+document.querySelector('form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const formData = new FormData(event.target);
+  const location = formData.get('location');
+  const weather = await getWeatherByLocation(location).then((results) => parseResults(results));
+  document.querySelector('output').textContent = weather.conditionText;
+});
