@@ -1,7 +1,7 @@
 const API_KEY = 'fb3d9117fe114f65a0920703243003';
 const API_URL = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}`;
 
-const locations = [];
+let locations = [];
 
 async function getWeatherByLocation(location) {
   const response = await fetch(`${API_URL}&q=${location}`);
@@ -73,6 +73,7 @@ addLocationForm.addEventListener('submit', async (event) => {
 
   if (locationIndex === -1) {
     locations.push(newLocation);
+    localStorage.setItem('locations', JSON.stringify(locations));
     renderLocations();
   } else {
     console.log('Location already added. Please update.');
@@ -90,5 +91,18 @@ updateButton.addEventListener('click', async (event) => {
     return newLocation;
   });
 
+  localStorage.setItem('locations', JSON.stringify(locations));
+
+  renderLocations();
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!localStorage.getItem('locations')) {
+    localStorage.setItem('locations', JSON.stringify([]));
+  } else {
+    locations = JSON.parse(localStorage.getItem('locations'));
+  }
+  
   renderLocations();
 });
