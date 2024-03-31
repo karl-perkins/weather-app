@@ -1,7 +1,7 @@
 const API_KEY = 'fb3d9117fe114f65a0920703243003';
 const API_URL = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}`;
 
-const weatherList = [];
+const locations = [];
 
 async function getWeatherByLocation(location) {
   const response = await fetch(`${API_URL}&q=${location}`);
@@ -14,7 +14,7 @@ async function getWeatherByLocation(location) {
 
 function parseResults(results) {
   return {
-    location: results.location.name,
+    name: results.location.name,
     country: results.location.country,
     celsius: results.current.temp_c,
     fahrenheit: results.current.temp_f,
@@ -23,54 +23,52 @@ function parseResults(results) {
   };
 }
 
-function renderWeatherItem(weather, weatherListElement) {
-  const weatherItem = document.createElement('div');
-  weatherItem.classList.add('weather');
+function renderLocation(location, locationsElement) {
+  const locationElement = document.createElement('div');
+  locationElement.classList.add('location');
 
-  const location = document.createElement('div');
-  location.classList.add('location');
-  location.textContent = `${weather.location}, ${weather.country}`;
-  weatherItem.appendChild(location);
+  const name = document.createElement('div');
+  name.classList.add('location');
+  name.textContent = `${location.name}, ${location.country}`;
+  locationElement.appendChild(name);
 
   const icon = document.createElement('img');
   icon.classList.add('icon');
-  icon.src = weather.conditionIcon;
-  weatherItem.appendChild(icon);
+  icon.src = location.conditionIcon;
+  locationElement.appendChild(icon);
 
   const condition = document.createElement('div');
   condition.classList.add('condition');
-  condition.textContent = weather.conditionText;
-  weatherItem.appendChild(condition);
+  condition.textContent = location.conditionText;
+  locationElement.appendChild(condition);
 
   const temperature = document.createElement('div');
   temperature.classList.add('temperature');
-  temperature.textContent = `${weather.celsius} \u00B0C`;
-  weatherItem.appendChild(temperature);
+  temperature.textContent = `${location.celsius} \u00B0C`;
+  locationElement.appendChild(temperature);
 
-  weatherListElement.appendChild(weatherItem);
+  locationsElement.appendChild(locationElement);
 }
 
 document.querySelector('form').addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(event.target);
-  const location = formData.get('location');
+  const locationName = formData.get('location');
 
-  const weather = await getWeatherByLocation(location).then((results) =>
+  const newLocation = await getWeatherByLocation(locationName).then((results) =>
     parseResults(results),
   );
 
-  const weatherIndex = weatherList.findIndex(
-    (w) => w.location === weather.location,
-  );
+  const locationIndex = locations.findIndex((l) => l.name === newLocation.name);
 
-  if (weatherIndex === -1) {
-    weatherList.push(weather);
+  if (locationIndex === -1) {
+    locations.push(newLocation);
 
-    const weatherListElement = document.querySelector('#weather-list');
-    weatherListElement.innerHTML = '';
+    const locationsElement = document.querySelector('#locations');
+    locationsElement.innerHTML = '';
 
-    weatherList.forEach((weatherItem) => {
-      renderWeatherItem(weatherItem, weatherListElement);
+    locations.forEach((location) => {
+      renderLocation(location, locationsElement);
     });
   } else {
     console.log('Location already added. Please update.');
