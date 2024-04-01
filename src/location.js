@@ -1,8 +1,8 @@
 const API_KEY = 'fb3d9117fe114f65a0920703243003';
 const API_URL = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}`;
 
-// Initialise locations to 
-const locations = !localStorage.getItem('locations')
+// Initialise locations to
+let locations = !localStorage.getItem('locations')
   ? localStorage.setItem('locations', JSON.stringify([]))
   : JSON.parse(localStorage.getItem('locations'));
 
@@ -45,13 +45,17 @@ export async function addLocation(name) {
   }
 }
 
-export function updateLocations() {
-  locations.map(async (location) => {
-    const newLocation = await getWeatherByLocation(location.name).then(
-      (results) => parseResults(results),
-    );
-    return newLocation;
-  });
+export async function updateLocations() {
+  const updatedLocations = await Promise.all(
+    locations.map(async (location) => {
+      const newLocation = await getWeatherByLocation(location.name).then(
+        (results) => parseResults(results),
+      );
+      return newLocation;
+    }),
+  );
+
+  locations = updatedLocations;
 
   localStorage.setItem('locations', JSON.stringify(locations));
 }

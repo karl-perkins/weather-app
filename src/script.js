@@ -51,8 +51,8 @@ addLocationForm.addEventListener('submit', async (event) => {
 });
 
 const updateButton = document.querySelector('.update-btn');
-updateButton.addEventListener('click', (event) => {
-  Location.updateLocations();
+updateButton.addEventListener('click', async (event) => {
+  await Location.updateLocations();
   renderLocations(Location.getLocations());
 });
 
