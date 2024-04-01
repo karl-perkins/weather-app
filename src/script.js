@@ -1,3 +1,5 @@
+import "./style.css";
+
 const API_KEY = 'fb3d9117fe114f65a0920703243003';
 const API_URL = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}`;
 
