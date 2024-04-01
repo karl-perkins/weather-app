@@ -1,29 +1,5 @@
 import "./style.css";
-
-const API_KEY = 'fb3d9117fe114f65a0920703243003';
-const API_URL = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}`;
-
-let locations = [];
-
-async function getWeatherByLocation(location) {
-  const response = await fetch(`${API_URL}&q=${location}`);
-  if (response.ok) {
-    const results = await response.json();
-    return results;
-  }
-  throw new Error('Invalid response received.');
-}
-
-function parseResults(results) {
-  return {
-    name: results.location.name,
-    country: results.location.country,
-    celsius: results.current.temp_c,
-    fahrenheit: results.current.temp_f,
-    conditionText: results.current.condition.text,
-    conditionIcon: results.current.condition.icon,
-  };
-}
+import * as Location from './location'
 
 function renderLocation(location, locationsElement) {
   const locationElement = document.createElement('div');
@@ -52,7 +28,7 @@ function renderLocation(location, locationsElement) {
   locationsElement.appendChild(locationElement);
 }
 
-function renderLocations() {
+function renderLocations(locations) {
   const locationsElement = document.querySelector('#locations');
   locationsElement.innerHTML = '';
 
@@ -67,44 +43,19 @@ addLocationForm.addEventListener('submit', async (event) => {
   const formData = new FormData(event.target);
   const locationName = formData.get('location');
 
-  const newLocation = await getWeatherByLocation(locationName).then((results) =>
-    parseResults(results),
-  );
+  await Location.addLocation(locationName);
 
-  const locationIndex = locations.findIndex((l) => l.name === newLocation.name);
-
-  if (locationIndex === -1) {
-    locations.push(newLocation);
-    localStorage.setItem('locations', JSON.stringify(locations));
-    renderLocations();
-  } else {
-    console.log('Location already added. Please update.');
-  }
+  renderLocations(Location.getLocations());
 
   event.target.reset();
 });
 
 const updateButton = document.querySelector('.update-btn');
-updateButton.addEventListener('click', async (event) => {
-  locations.map(async (location) => {
-    const newLocation = await getWeatherByLocation(location.name).then(
-      (results) => parseResults(results),
-    );
-    return newLocation;
-  });
-
-  localStorage.setItem('locations', JSON.stringify(locations));
-
-  renderLocations();
+updateButton.addEventListener('click', (event) => {
+  Location.updateLocations();
+  renderLocations(Location.getLocations());
 });
 
-
 document.addEventListener('DOMContentLoaded', () => {
-  if (!localStorage.getItem('locations')) {
-    localStorage.setItem('locations', JSON.stringify([]));
-  } else {
-    locations = JSON.parse(localStorage.getItem('locations'));
-  }
-  
-  renderLocations();
+  renderLocations(Location.getLocations());
 });
